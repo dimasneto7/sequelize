@@ -8,13 +8,23 @@ const app = express()
 
 const conn = require('./db/conn')
 
+// Models
+const Tought = require('./models/Tought')
+const User = require('./models/User')
+
+// Routes
+const toughtsRoutes = require('./routes/toughtsRouter')
+
+// Controller
+const ToughtController = require('./controllers/ToughtController')
+
 // template engine
 app.engine('handlebars', exphbs())
 app.set('view engine', 'handlebars')
 
 // receber resposta do body
 app.use(
-  express.urlenconded({
+  express.urlencoded({
     extended: true,
   })
 )
@@ -49,15 +59,20 @@ app.use(express.static('public'))
 
 // set session to res
 app.use((req, res, next) => {
-
-  if.(req.session.userid) {
+  if (req.session.userid) {
     res.locals.session = req.session
   }
 
   next()
 })
 
+// Routes
+app.use('/toughts', toughtsRoutes)
+
+app.get('/', ToughtController.showToughts)
+
 conn
+  // .sync({ force: true })
   .sync()
   .then(() => {
     app.listen(3000)
